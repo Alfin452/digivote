@@ -49,7 +49,7 @@
                         <span class="block text-3xl font-black text-gray-800 mt-1">{{ number_format($team->vote_count, 0, ',', '.') }}</span>
                     </div>
 
-                    <a href="#" class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-sm">
+                    <a href=" {{ route('vote.create', ['slug' => $event->slug, 'kandidat' => $team->number]) }}" class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-sm">
                         Dukung Kandidat
                     </a>
                 </div>
