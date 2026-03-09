@@ -40,6 +40,18 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // Guard untuk Admin Event
+        'event_admin' => [
+            'driver' => 'session',
+            'provider' => 'event_admins',
+        ],
+
+        // Guard untuk Super Admin (Persiapan Sprint 5)
+        'super_admin' => [
+            'driver' => 'session',
+            'provider' => 'super_admins',
+        ],
     ],
 
     /*
@@ -65,10 +77,17 @@ return [
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        // Provider untuk Admin Event
+        'event_admins' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\EventAdmin::class,
+        ],
+
+        // Provider untuk Super Admin
+        'super_admins' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\SuperAdmin::class,
+        ],
     ],
 
     /*
