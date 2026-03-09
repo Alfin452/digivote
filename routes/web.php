@@ -14,6 +14,7 @@ use App\Http\Controllers\AdminEvent\AuthController as AdminEventAuthController;
 use App\Http\Controllers\AdminEvent\DashboardController as AdminEventDashboardController;
 use App\Http\Controllers\AdminEvent\TransactionController as AdminEventTransactionController;
 use App\Http\Controllers\AdminEvent\LeaderboardController;
+use App\Http\Controllers\AdminEvent\VoteController as AdminEventVoteController;
 
 
 Route::get('/', function () {
@@ -63,7 +64,9 @@ Route::prefix('admin-event')->name('admin-event.')->group(function () {
         Route::delete('/leaderboard/{id}', [LeaderboardController::class, 'destroy'])->name('team.destroy');
 
         Route::get('/qr-links', [QrLinkController::class, 'index'])->name('qr-links');
-        Route::get('/transactions', [AdminEventTransactionController::class, 'index'])->name('transactions'); 
+        Route::get('/transactions', [AdminEventTransactionController::class, 'index'])->name('transactions');
+        Route::get('/votes', [AdminEventVoteController::class, 'index'])->name('votes');
+        
         Route::post('/logout', [AdminEventAuthController::class, 'logout'])->name('logout');
     });
 });
