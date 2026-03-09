@@ -16,6 +16,9 @@ use App\Http\Controllers\AdminEvent\TransactionController as AdminEventTransacti
 use App\Http\Controllers\AdminEvent\LeaderboardController;
 use App\Http\Controllers\AdminEvent\VoteController as AdminEventVoteController;
 
+//superadmin
+use App\Http\Controllers\Admin\AuthController as SuperAdminAuthController;
+use App\Http\Controllers\Admin\DashboardController as SuperAdminDashboardController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -68,6 +71,23 @@ Route::prefix('admin-event')->name('admin-event.')->group(function () {
         Route::get('/votes', [AdminEventVoteController::class, 'index'])->name('votes');
         
         Route::post('/logout', [AdminEventAuthController::class, 'logout'])->name('logout');
+    });
+});
+
+// RUTE SUPER ADMIN 
+Route::prefix('admin')->name('admin.')->group(function () {
+    // Route untuk guest (belum login)
+    Route::middleware('guest:super_admin')->group(function () {
+        Route::get('/login', [SuperAdminAuthController::class, 'showLoginForm'])->name('login');
+        Route::post('/login', [SuperAdminAuthController::class, 'login'])->name('login.post');
+    });
+
+    // Route yang butuh login Super Admin
+    Route::middleware('auth:super_admin')->group(function () {
+        Route::get('/dashboard', [SuperAdminDashboardController::class, 'index'])->name('dashboard');
+        Route::resource('events', \App\Http\Controllers\Admin\EventController::class);
+        Route::resource('events', App\Http\Controllers\Admin\EventController::class)->names('events');
+        Route::post('/logout', [SuperAdminAuthController::class, 'logout'])->name('logout');
     });
 });
 
