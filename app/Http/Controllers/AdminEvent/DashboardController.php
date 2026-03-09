@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Team;
 use App\Models\Invoice;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -34,6 +35,12 @@ class DashboardController extends Controller
             ->where('status', 'paid')
             ->sum('amount');
 
-        return view('admin-event.dashboard', compact('event', 'admin', 'leaderboard', 'totalVotes', 'totalIncome'));
+        $todayIncome = Invoice::where('event_id', $event->id)
+            ->where('status', 'paid')
+            ->whereDate('paid_at', Carbon::today())
+            ->sum('amount');
+
+        // Lalu kirimkan via compact('event', 'totalVotes', 'totalIncome', 'leaderboard', 'todayIncome');
+        return view('admin-event.dashboard', compact('event', 'admin', 'leaderboard', 'totalVotes', 'totalIncome', 'todayIncome'));
     }
 }
