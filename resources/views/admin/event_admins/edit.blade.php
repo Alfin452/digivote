@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Buat Akun Panitia')
+@section('title', 'Edit Akun Panitia')
 
 @section('content')
 <div class="mb-8">
@@ -10,8 +10,8 @@
         </svg>
         Kembali ke Daftar Panitia
     </a>
-    <h1 class="text-3xl font-black text-slate-100 tracking-tight">Buat Akun Panitia Baru</h1>
-    <p class="text-slate-400 mt-1">Tambahkan kredensial akun panitia (Event Admin) yang akan mengelola event tertentu.</p>
+    <h1 class="text-3xl font-black text-slate-100 tracking-tight">Edit Data Panitia</h1>
+    <p class="text-slate-400 mt-1">Ubah informasi akun panitia untuk event <span class="font-bold text-slate-200">"{{ $eventAdmin->event->name ?? 'Tidak diketahui' }}"</span>.</p>
 </div>
 
 <div class="bg-slate-900 rounded-2xl shadow-xl border border-slate-800 overflow-hidden w-full">
@@ -26,22 +26,23 @@
         </div>
         @endif
 
-        <form action="{{ route('admin.event-admins.store') }}" method="POST" autocomplete="off">
+        <form action="{{ route('admin.event-admins.update', $eventAdmin->id) }}" method="POST">
             @csrf
+            @method('PUT')
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
                     <label class="block text-sm font-bold text-slate-300 mb-2">Nama Panitia <span class="text-red-400">*</span></label>
-                    <input type="text" name="name" value="{{ old('name') }}" required placeholder="Contoh: Panitia BEM" autocomplete="off" class="w-full px-4 py-3 bg-slate-950 text-slate-200 rounded-xl border border-slate-800 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all placeholder-slate-600">
+                    <input type="text" name="name" value="{{ old('name', $eventAdmin->name) }}" required class="w-full px-4 py-3 bg-slate-950 text-slate-200 rounded-xl border border-slate-800 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all placeholder-slate-600">
                 </div>
 
                 <div>
                     <label class="block text-sm font-bold text-slate-300 mb-2">Pilih Event yang Dikelola <span class="text-red-400">*</span></label>
                     <div class="relative group">
                         <select name="event_id" required class="w-full px-4 py-3 bg-slate-950 text-slate-200 rounded-xl border border-slate-800 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all appearance-none cursor-pointer">
-                            <option value="" disabled {{ old('event_id') ? '' : 'selected' }}>Pilih Event...</option>
+                            <option value="" disabled>Pilih Event...</option>
                             @foreach($events as $event)
-                            <option value="{{ $event->id }}" {{ old('event_id') == $event->id ? 'selected' : '' }} class="bg-slate-900">
+                            <option value="{{ $event->id }}" {{ (old('event_id', $eventAdmin->event_id) == $event->id) ? 'selected' : '' }} class="bg-slate-900">
                                 {{ $event->name }}
                             </option>
                             @endforeach
@@ -58,14 +59,14 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 <div>
                     <label class="block text-sm font-bold text-slate-300 mb-2">Email (Username) <span class="text-red-400">*</span></label>
-                    <input type="email" name="email" value="{{ old('email') }}" required placeholder="Contoh: panitia@digivote.com" autocomplete="off" class="w-full px-4 py-3 bg-slate-950 text-slate-200 rounded-xl border border-slate-800 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all placeholder-slate-600">
+                    <input type="email" name="email" value="{{ old('email', $eventAdmin->email) }}" required class="w-full px-4 py-3 bg-slate-950 text-slate-200 rounded-xl border border-slate-800 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all placeholder-slate-600">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold text-slate-300 mb-2">Password <span class="text-red-400">*</span></label>
+                    <label class="block text-sm font-bold text-slate-300 mb-2">Password Baru <span class="text-slate-500 font-normal">(Opsional)</span></label>
 
                     <div class="relative">
-                        <input type="password" id="password_input" name="password" required placeholder="Minimal 6 karakter" autocomplete="new-password" class="w-full px-4 py-3 pr-12 bg-slate-950 text-slate-200 placeholder-slate-600 rounded-xl border border-slate-800 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all">
+                        <input type="password" id="password_input" name="password" placeholder="Kosongkan jika tidak ingin mengubah" class="w-full px-4 py-3 pr-12 bg-slate-950 text-slate-200 placeholder-slate-600 rounded-xl border border-slate-800 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition-all">
 
                         <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-0 flex items-center px-4 text-slate-500 hover:text-purple-400 focus:outline-none transition-colors" title="Lihat/Sembunyikan Password">
                             <svg id="eye_icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,12 +78,14 @@
                             </svg>
                         </button>
                     </div>
+
+                    <p class="text-xs text-slate-500 mt-2">Hanya diisi jika Anda ingin mereset/mengganti password akun panitia ini.</p>
                 </div>
             </div>
 
             <div class="flex justify-end pt-6 border-t border-slate-800">
                 <button type="submit" class="bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-400 hover:to-cyan-400 text-slate-950 font-black tracking-wide py-3 px-8 rounded-xl transition-all shadow-lg shadow-purple-500/20">
-                    Simpan & Buat Akun
+                    Simpan Perubahan Akun
                 </button>
             </div>
         </form>
@@ -96,10 +99,12 @@
         const eyeSlashIcon = document.getElementById('eye_slash_icon');
 
         if (passwordInput.type === 'password') {
+            // Ubah ke mode text (lihat password)
             passwordInput.type = 'text';
             eyeIcon.classList.add('hidden');
             eyeSlashIcon.classList.remove('hidden');
         } else {
+            // Kembalikan ke mode password (sensor)
             passwordInput.type = 'password';
             eyeIcon.classList.remove('hidden');
             eyeSlashIcon.classList.add('hidden');

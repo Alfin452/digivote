@@ -48,9 +48,12 @@ class EventAdminController extends Controller
 
     public function edit($id)
     {
-        $admin = EventAdmin::findOrFail($id);
+        // Ubah variabel $admin menjadi $eventAdmin
+        $eventAdmin = EventAdmin::findOrFail($id);
         $events = Event::orderByDesc('created_at')->get();
-        return view('admin.event_admins.edit', compact('admin', 'events'));
+
+        // Sesuaikan compact memanggil 'eventAdmin'
+        return view('admin.event_admins.edit', compact('eventAdmin', 'events'));
     }
 
     public function update(Request $request, $id)

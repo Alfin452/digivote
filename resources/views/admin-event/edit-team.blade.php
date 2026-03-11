@@ -4,7 +4,6 @@
 
 @section('content')
 
-{{-- Bagian Header tetap di kiri (tidak dibungkus mx-auto) --}}
 <div class="mb-8">
     <a href="{{ route('admin-event.leaderboard') }}" class="inline-flex items-center text-cyan-500 hover:text-cyan-400 font-bold mb-4 transition-colors">
         <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -16,8 +15,7 @@
     <p class="text-slate-400 mt-1">Ubah informasi peserta. Biarkan foto kosong jika tidak ingin mengganti gambar.</p>
 </div>
 
-{{-- Bagian Form diberi 'max-w-2xl mx-auto' agar card-nya saja yang ke tengah --}}
-<div class="bg-slate-900 rounded-2xl shadow-sm border border-slate-800 overflow-hidden max-w-2xl mx-auto">
+<div class="bg-slate-900 rounded-2xl shadow-sm border border-slate-800 overflow-hidden w-full">
     <div class="p-6 md:p-8">
 
         @if ($errors->any())
@@ -42,7 +40,7 @@
 
                 <div>
                     <label for="category_id" class="block text-sm font-bold text-slate-300 mb-2">Kategori <span class="text-rose-500">*</span></label>
-                    <select name="category_id" id="category_id" required class="w-full px-4 py-3 bg-slate-800/50 text-white rounded-xl border border-slate-700 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all">
+                    <select name="category_id" id="category_id" required class="w-full px-4 py-3 bg-slate-800/50 text-white rounded-xl border border-slate-700 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all appearance-none cursor-pointer">
                         @foreach($categories as $category)
                         <option value="{{ $category->id }}" class="bg-slate-800" {{ (old('category_id', $team->category_id) == $category->id) ? 'selected' : '' }}>{{ $category->name }}</option>
                         @endforeach
@@ -50,24 +48,26 @@
                 </div>
             </div>
 
-            <div class="mb-6">
-                <label for="name" class="block text-sm font-bold text-slate-300 mb-2">Nama Lengkap / Nama Tim <span class="text-rose-500">*</span></label>
-                <input type="text" name="name" id="name" value="{{ old('name', $team->name) }}" required class="w-full px-4 py-3 bg-slate-800/50 text-white rounded-xl border border-slate-700 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all placeholder-slate-500">
-            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label for="name" class="block text-sm font-bold text-slate-300 mb-2">Nama Lengkap / Nama Tim <span class="text-rose-500">*</span></label>
+                    <input type="text" name="name" id="name" value="{{ old('name', $team->name) }}" required class="w-full px-4 py-3 bg-slate-800/50 text-white rounded-xl border border-slate-700 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all placeholder-slate-500">
+                </div>
 
-            <div class="mb-6">
-                <label for="location" class="block text-sm font-bold text-slate-300 mb-2">Asal / Instansi / Lokasi</label>
-                <input type="text" name="location" id="location" value="{{ old('location', $team->location) }}" class="w-full px-4 py-3 bg-slate-800/50 text-white rounded-xl border border-slate-700 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all placeholder-slate-500">
+                <div>
+                    <label for="location" class="block text-sm font-bold text-slate-300 mb-2">Asal / Instansi / Lokasi</label>
+                    <input type="text" name="location" id="location" value="{{ old('location', $team->location) }}" class="w-full px-4 py-3 bg-slate-800/50 text-white rounded-xl border border-slate-700 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all placeholder-slate-500">
+                </div>
             </div>
 
             <div class="mb-8">
                 <label for="image" class="block text-sm font-bold text-slate-300 mb-2">Ganti Foto / Logo (Opsional)</label>
                 @if($team->image)
-                <div class="mb-3 p-2 bg-slate-800/50 rounded-xl border border-slate-700 inline-block">
+                <div class="mb-4 p-2 bg-slate-800/50 rounded-xl border border-slate-700 inline-block shadow-inner">
                     <img src="{{ asset('storage/' . $team->image) }}" alt="Foto Lama" class="w-20 h-20 object-cover rounded-lg border border-slate-600">
                 </div>
                 @endif
-                <input type="file" name="image" id="image" accept="image/jpeg, image/png, image/webp" class="w-full px-4 py-3 bg-slate-800/50 text-slate-300 rounded-xl border border-slate-700 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-slate-700 file:text-cyan-400 hover:file:bg-slate-600">
+                <input type="file" name="image" id="image" accept="image/jpeg, image/png, image/webp" class="w-full px-4 py-3 bg-slate-800/50 text-slate-300 rounded-xl border border-slate-700 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-slate-700 file:text-cyan-400 hover:file:bg-slate-600 cursor-pointer">
                 <p class="text-xs text-slate-500 mt-2">Format yang didukung: JPG, PNG, WEBP. Maksimal 2MB.</p>
             </div>
 
