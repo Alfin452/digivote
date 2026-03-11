@@ -44,26 +44,34 @@
                             <div>
                                 <div class="font-bold text-slate-200">{{ $event->name }}</div>
                                 <div class="text-[11px] text-purple-400 font-mono mt-0.5">/{{ $event->slug }}</div>
+                                @if($event->org)
+                                <div class="text-xs text-slate-500 mt-1">{{ $event->org }}</div>
+                                @endif
                             </div>
                         </div>
                     </td>
                     <td class="py-5 px-6">
                         <div class="text-sm font-bold text-slate-200">Rp {{ number_format($event->price_per_vote, 0, ',', '.') }}</div>
+                        <div class="text-xs text-slate-500 mt-1">Min: {{ $event->min_vote }} vote</div>
                     </td>
                     <td class="py-5 px-6">
                         <div class="text-xs text-slate-400">
-                            {{ \Carbon\Carbon::parse($event->start_date)->format('d M Y') }} -
-                            {{ \Carbon\Carbon::parse($event->end_date)->format('d M Y') }}
+                            {{ \Carbon\Carbon::parse($event->started_at)->format('d M Y') }} -
+                            {{ \Carbon\Carbon::parse($event->ended_at)->format('d M Y') }}
                         </div>
                     </td>
                     <td class="py-5 px-6 text-center">
-                        @if($event->status === 'active')
+                        @if($event->status === 'live')
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase">
-                            Active
+                            Live
                         </span>
-                        @elseif($event->status === 'completed')
+                        @elseif($event->status === 'done')
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-[10px] font-bold uppercase">
-                            Completed
+                            Done
+                        </span>
+                        @elseif($event->status === 'soon')
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase">
+                            Soon
                         </span>
                         @else
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-bold uppercase">
@@ -110,7 +118,8 @@
 
 <script>
     function confirmDelete(id) {
-        swalDark.fire({
+        // PERBAIKAN: Menggunakan Swal (standar SweetAlert2)
+        Swal.fire({
             title: 'Hapus Event Ini?',
             text: "Semua data kandidat dan suara terkait event ini bisa bermasalah!",
             icon: 'warning',

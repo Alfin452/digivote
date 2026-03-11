@@ -19,6 +19,8 @@ use App\Http\Controllers\AdminEvent\VoteController as AdminEventVoteController;
 use App\Http\Controllers\Admin\AuthController as SuperAdminAuthController;
 use App\Http\Controllers\Admin\DashboardController as SuperAdminDashboardController;
 use App\Http\Controllers\Admin\EventController as SuperAdminEventController;
+use App\Http\Controllers\Admin\TransactionController as SuperAdminTransactionController;
+use App\Http\Controllers\Admin\SettingController as SuperAdminSettingController;
 use App\Http\Controllers\Admin\EventAdminController;
 
 Route::get('/', function () {
@@ -92,8 +94,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // 2. Manajemen Event dan Akun Panitia (Penulisan dirapikan)
         Route::resource('events', SuperAdminEventController::class);
         Route::resource('event-admins', EventAdminController::class);
-
-        // 3. Logout
+        Route::get('/transactions', [SuperAdminTransactionController::class, 'index'])->name('transactions.index');        // 3. Logout
+        Route::get('/settings', [SuperAdminSettingController::class, 'index'])->name('settings.index');
+        Route::put('/settings', [SuperAdminSettingController::class, 'update'])->name('settings.update');
         Route::post('/logout', [SuperAdminAuthController::class, 'logout'])->name('logout');
     });
 });

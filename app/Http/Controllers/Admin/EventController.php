@@ -26,12 +26,14 @@ class EventController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'org' => 'required|string|max:255', // Validasi ORG ditambahkan
+            'org' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price_per_vote' => 'required|numeric|min:0',
-            'status' => 'required|in:draft,active,completed',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
+            'min_vote' => 'required|numeric|min:1',
+            // PERBAIKAN: Sesuaikan dengan enum di database
+            'status' => 'required|in:draft,soon,live,done',
+            'started_at' => 'required|date',
+            'ended_at' => 'required|date|after_or_equal:started_at',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
@@ -47,13 +49,13 @@ class EventController extends Controller
         $event = Event::create([
             'name' => $request->name,
             'slug' => $finalSlug,
-            'org' => $request->org, // Menyimpan ORG
+            'org' => $request->org,
             'description' => $request->description,
             'price_per_vote' => $request->price_per_vote,
-            'min_vote' => 1,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
-            'status' => $request->status,
+            'min_vote' => $request->min_vote,
+            'started_at' => $request->started_at,
+            'ended_at' => $request->ended_at,
+            'status' => $request->status, // Mengirim status yang benar
             'logo_path' => $logoPath,
         ]);
 
@@ -77,31 +79,40 @@ class EventController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'org' => 'required|string|max:255', // Validasi ORG ditambahkan
+            'org' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price_per_vote' => 'required|numeric|min:0',
-            'status' => 'required|in:draft,active,completed',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
+            'min_vote' => 'required|numeric|min:1',
+            'status' => 'required|in:draft,soon,live,done',
+            'started_at' => 'required|date',
+            'ended_at' => 'required|date|after_or_equal:started_at',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
-        if ($request->hasFile('logo')) {
-            if ($event->logo_path) {
-                Storage::disk('public')->delete($event->logo_path);
-            }
-            $event->logo_path = $request->file('logo')->store('events', 'public');
-        }
-
-        $event->update([
+        // Siapkan data yang akan diupdate
+        $data = [
             'name' => $request->name,
-            'org' => $request->org, // Update ORG
+            'org' => $request->org,
             'description' => $request->description,
             'price_per_vote' => $request->price_per_vote,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
+            'min_vote' => $request->min_vote,
+            'started_at' => $request->started_at,
+            'ended_at' => $request->ended_at,
             'status' => $request->status,
-        ]);
+        ];
+
+        // Jika user mengunggah logo baru
+        if ($request->hasFile('logo')) {
+            // Hapus logo lama dari storage jika ada
+            if ($event->logo_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($event->logo_path)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($event->logo_path);
+            }
+            // Simpan logo baru dan masukkan ke array data
+            $data['logo_path'] = $request->file('logo')->store('events', 'public');
+        }
+
+        // Eksekusi update
+        $event->update($data);
 
         return redirect()->route('admin.events.index')->with('success', 'Data Event berhasil diperbarui!');
     }
