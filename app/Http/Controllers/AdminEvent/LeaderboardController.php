@@ -151,21 +151,28 @@ class LeaderboardController extends Controller
     // Menghapus data kandidat
     public function destroy($id)
     {
-        $admin = Auth::guard('event_admin')->user();
-        $event = $admin->event;
-        $team = \App\Models\Team::where('id', $id)->where('event_id', $event->id)->firstOrFail();
+        $eventAdmin = \Illuminate\Support\Facades\Auth::guard('event_admin')->user();
 
-        // Hapus file gambar dari storage jika ada
-        if ($team->image_path) {
-            Storage::disk('public')->delete($team->image_path);
+        // Cari data tim/kandidat yang ingin dihapus
+        $team = \App\Models\Team::where('event_id', $eventAdmin->event_id)->findOrFail($id);
+
+        // CEK KEAMANAN: Apakah kandidat ini sudah punya riwayat transaksi/invoice?
+        $hasTransactions = \App\Models\Invoice::where('team_id', $team->id)->exists();
+
+        if ($hasTransactions) {
+            // Tolak penghapusan dan kembalikan dengan pesan error merah
+            return redirect()->route('admin-event.leaderboard')
+                ->with('error', 'Gagal! Kandidat ini tidak bisa dihapus karena sudah memiliki riwayat transaksi/suara masuk. Data keuangan harus dijaga.');
         }
 
-        // Hapus dari database
+        // Jika aman (belum ada transaksi), hapus foto dari storage (jika ada)
+        if ($team->image_path) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($team->image_path);
+        }
+
+        // Hapus kandidat dari database
         $team->delete();
 
-        // Bersihkan cache
-        Cache::forget('teams_' . $event->id);
-
-        return redirect()->route('admin-event.leaderboard')->with('success', 'Kandidat berhasil dihapus!');
+        return redirect()->route('admin-event.leaderboard')->with('success', 'Kandidat beserta fotonya berhasil dihapus secara permanen!');
     }
 }
