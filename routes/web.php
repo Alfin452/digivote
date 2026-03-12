@@ -13,8 +13,10 @@ use App\Http\Controllers\AdminEvent\QrLinkController;
 use App\Http\Controllers\AdminEvent\AuthController as AdminEventAuthController;
 use App\Http\Controllers\AdminEvent\DashboardController as AdminEventDashboardController;
 use App\Http\Controllers\AdminEvent\TransactionController as AdminEventTransactionController;
-use App\Http\Controllers\AdminEvent\LeaderboardController;
+use App\Http\Controllers\AdminEvent\CategoryController as AdminEventCategoryController;
 use App\Http\Controllers\AdminEvent\VoteController as AdminEventVoteController;
+use App\Http\Controllers\AdminEvent\LeaderboardController;
+
 
 use App\Http\Controllers\Admin\AuthController as SuperAdminAuthController;
 use App\Http\Controllers\Admin\DashboardController as SuperAdminDashboardController;
@@ -62,6 +64,7 @@ Route::prefix('admin-event')->name('admin-event.')->group(function () {
     Route::middleware('auth:event_admin')->group(function () {
         Route::get('/overview', [AdminEventDashboardController::class, 'index'])->name('dashboard');
 
+        Route::resource('categories', AdminEventCategoryController::class)->names('categories');
         Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard');
         Route::get('/leaderboard/create', [LeaderboardController::class, 'create'])->name('team.create');
         Route::post('/leaderboard', [LeaderboardController::class, 'store'])->name('team.store');
