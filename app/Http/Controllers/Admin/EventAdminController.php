@@ -10,10 +10,45 @@ use Illuminate\Support\Facades\Hash;
 
 class EventAdminController extends Controller
 {
-    public function index()
+    public function index(Request $request) // PERBAIKAN: Tambahkan Request $request
     {
-        // Ambil data akun panitia beserta relasi event-nya
-        $admins = EventAdmin::with('event')->orderByDesc('created_at')->paginate(10);
+        $query = EventAdmin::with('event');
+
+        // 1. Fitur Search (Nama atau Email)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        // 2. Filter Status Event (Sudah Tertaut / Belum)
+        if ($request->filled('event_filter')) {
+            if ($request->event_filter === 'linked') {
+                $query->whereNotNull('event_id');
+            } elseif ($request->event_filter === 'unlinked') {
+                $query->whereNull('event_id');
+            }
+        }
+
+        // 3. Fitur Urutkan (Sort)
+        $sort = $request->sort ?? 'latest';
+        switch ($sort) {
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'name_asc':
+                $query->orderBy('name', 'asc');
+                break;
+            case 'latest':
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+
+        // Eksekusi query dengan pagination
+        $admins = $query->paginate(10);
         return view('admin.event_admins.index', compact('admins'));
     }
 

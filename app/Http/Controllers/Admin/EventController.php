@@ -11,9 +11,47 @@ use Illuminate\Support\Facades\Storage;
 
 class EventController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $events = Event::orderByDesc('created_at')->paginate(10);
+        // 1. Inisialisasi Query Builder
+        $query = Event::query();
+
+        // 2. Filter Pencarian (Search)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('slug', 'like', "%{$search}%")
+                    ->orWhere('org', 'like', "%{$search}%");
+            });
+        }
+
+        // 3. Filter Status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // 4. Filter Urutan (Sort)
+        $sort = $request->sort ?? 'latest';
+        switch ($sort) {
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('price_per_vote', 'desc');
+                break;
+            case 'price_asc':
+                $query->orderBy('price_per_vote', 'asc');
+                break;
+            case 'latest':
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+
+        // 5. Eksekusi Query dan Paginate (10 data per halaman)
+        $events = $query->paginate(10);
+
         return view('admin.events.index', compact('events'));
     }
 

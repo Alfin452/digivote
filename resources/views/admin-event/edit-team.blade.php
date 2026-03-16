@@ -62,9 +62,9 @@
 
             <div class="mb-8">
                 <label for="image" class="block text-sm font-bold text-slate-300 mb-2">Ganti Foto / Logo (Opsional)</label>
-                @if($team->image)
+                @if($team->image_path)
                 <div class="mb-4 p-2 bg-slate-800/50 rounded-xl border border-slate-700 inline-block shadow-inner">
-                    <img src="{{ asset('storage/' . $team->image) }}" alt="Foto Lama" class="w-20 h-20 object-cover rounded-lg border border-slate-600">
+                    <img src="{{ asset('storage/' . $team->image_path) }}" alt="Foto Lama" class="w-20 h-20 object-cover rounded-lg border border-slate-600">
                 </div>
                 @endif
                 <input type="file" name="image" id="image" accept="image/jpeg, image/png, image/webp" class="w-full px-4 py-3 bg-slate-800/50 text-slate-300 rounded-xl border border-slate-700 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-slate-700 file:text-cyan-400 hover:file:bg-slate-600 cursor-pointer">

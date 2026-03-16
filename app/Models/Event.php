@@ -17,6 +17,7 @@ class Event extends Model
         'price_per_vote',
         'min_vote',
         'status',
+        'logo_path',
         'started_at',
         'ended_at',
         'fee_percent'
