@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 // publik
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\VoteController;
 use App\Http\Controllers\WebhookController;
 
@@ -25,8 +26,11 @@ use App\Http\Controllers\Admin\TransactionController as SuperAdminTransactionCon
 use App\Http\Controllers\Admin\SettingController as SuperAdminSettingController;
 use App\Http\Controllers\Admin\EventAdminController;
 
-Route::get('/', function () {
-    return view('welcome');
+// Halaman Publik (Multi-page)
+Route::controller(HomeController::class)->group(function () {
+    Route::get('/', 'index')->name('home');
+    Route::get('/cara-kerja', 'howItWorks')->name('home.cara-kerja');
+    Route::get('/live-events', 'liveEvents')->name('home.live-events');
 });
 
 Route::get('/dashboard', function () {
