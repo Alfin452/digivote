@@ -22,58 +22,29 @@
         border: 1px solid rgba(255, 255, 255, 0.5);
         box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
     }
-
-    /* Animasi Fade In Berjenjang */
-    @keyframes slideUpFade {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .animate-slide-up {
-        animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
-    .delay-100 {
-        animation-delay: 100ms;
-    }
-
-    .delay-200 {
-        animation-delay: 200ms;
-    }
-
-    .delay-300 {
-        animation-delay: 300ms;
-    }
 </style>
 @endpush
 
 @section('content')
 
 @php
-// Logika Penghitungan Waktu Event (Fitur Baru)
+// Logika Penghitungan Waktu Event yang Aman
 $now = \Carbon\Carbon::now();
-$start = \Carbon\Carbon::parse($event->started_at);
-$end = \Carbon\Carbon::parse($event->ended_at);
+$start = \Carbon\Carbon::parse($event->started_at ?? now());
+$end = \Carbon\Carbon::parse($event->ended_at ?? now()->addDays(1));
 
-$totalDuration = $start->diffInMinutes($end) ?: 1; // Cegah division by zero
+$totalDuration = $start->diffInMinutes($end) ?: 1;
 $elapsed = $start->diffInMinutes($now, false);
 
 if ($elapsed < 0) {
-    $timeProgress=0; // Belum mulai
+    $timeProgress=0;
     $daysLeft=$now->diffInDays($start);
     $timeText = "Dimulai dalam $daysLeft hari";
     } elseif ($now->gt($end)) {
-    $timeProgress = 100; // Sudah selesai
+    $timeProgress = 100;
     $timeText = "Event telah berakhir";
     } else {
-    $timeProgress = min(100, max(0, ($elapsed / $totalDuration) * 100)); // Sedang berjalan
+    $timeProgress = min(100, max(0, ($elapsed / $totalDuration) * 100));
     $daysLeft = $now->diffInDays($end);
     $hoursLeft = $now->copy()->addDays($daysLeft)->diffInHours($end);
     $timeText = "Sisa waktu: $daysLeft Hari, $hoursLeft Jam";
@@ -81,7 +52,7 @@ if ($elapsed < 0) {
     @endphp
 
     {{-- ===== 1. HERO COMMAND CENTER & TIMELINE ===== --}}
-    <div class="relative bg-white border border-slate-200 shadow-sm rounded-3xl p-6 lg:p-8 mb-8 overflow-hidden animate-slide-up opacity-0">
+    <div class="relative bg-white border border-slate-200 shadow-sm rounded-3xl p-6 lg:p-8 mb-8 overflow-hidden">
 
         {{-- Decorative Background --}}
         <div class="absolute inset-0 bg-mesh-pattern opacity-[0.1] pointer-events-none"></div>
@@ -151,7 +122,7 @@ if ($elapsed < 0) {
                 </div>
             </div>
 
-            {{-- Kanan: Event Timeline Widget (Fitur Baru) --}}
+            {{-- Kanan: Event Timeline Widget --}}
             <div class="w-full xl:w-96 bg-slate-50 border border-slate-200 rounded-2xl p-5 shadow-inner flex flex-col justify-center">
                 <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Event Timeline Widget</h3>
 
@@ -176,11 +147,10 @@ if ($elapsed < 0) {
     </div>
 
     {{-- ===== 2. METRIC STAT CARDS DENGAN SPARKLINE ===== --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-slide-up delay-100 opacity-0">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
         {{-- Card 1: Total Suara --}}
         <div class="bg-white border border-slate-200/80 shadow-sm rounded-3xl p-6 relative overflow-hidden group hover:border-blue-300 hover:shadow-lg transition-all duration-300">
-            {{-- Mini SVG Sparkline Background --}}
             <svg class="absolute bottom-0 left-0 w-full h-16 text-blue-50 opacity-50 group-hover:scale-105 transition-transform duration-500" preserveAspectRatio="none" viewBox="0 0 100 100">
                 <path d="M0,100 C20,80 40,90 60,40 C80,10 100,60 100,60 L100,100 Z" fill="currentColor" />
             </svg>
@@ -257,7 +227,7 @@ if ($elapsed < 0) {
     </div>
 
     {{-- ===== 3. BENTO GRID: LEADER SPOTLIGHT & DISTRIBUTION ===== --}}
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 animate-slide-up delay-200 opacity-0">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
 
         {{-- BENTO 1: The Holographic Leader Spotlight --}}
         @php $leader = $leaderboard->first(); @endphp
@@ -391,7 +361,7 @@ if ($elapsed < 0) {
     </div>
 
     {{-- ===== 4. LEADERBOARD TABLE ===== --}}
-    <div class="bg-white border border-slate-200/80 shadow-sm rounded-3xl overflow-hidden mb-8 animate-slide-up delay-300 opacity-0">
+    <div class="bg-white border border-slate-200/80 shadow-sm rounded-3xl overflow-hidden mb-8">
         <div class="px-8 py-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 bg-slate-50/50">
             <div>
                 <h2 class="text-xl font-heading font-bold text-slate-800">Tabel Peringkat Lengkap</h2>
@@ -509,7 +479,7 @@ if ($elapsed < 0) {
                         bar.style.width = targetWidth;
                     }
                 });
-            }, 500);
+            }, 150);
         });
     </script>
     @endpush
